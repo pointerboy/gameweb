@@ -8,3 +8,7 @@ def login_route():
 @app.route('/')
 def landing():
     return render_template('landingpage/index.html')
+
+@app.route('/register')
+def register_route():
+    return render_template('usercontrol/register.html')
