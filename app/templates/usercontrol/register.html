@@ -28,13 +28,13 @@
           </div>
         </nav>
     
-        <div class="input-group flex-nowrap">
+        <form class="input-group flex-nowrap" action="{{ url_for('register_route') }}" method="POST">
                 <div class="input-group-prepend">
                   <span class="input-group-text" id="addon-wrapping">@</span>
                 </div>
-                <input type="text" class="form-control" placeholder="Email" aria-label="Email" aria-describedby="addon-wrapping">
-                <input type="password" class="form-control" placeholder="Password" aria-label="Password" aria-describedby="addon-wrapping">
-                <input type="password" class="form-control" placeholder="Confirm Password" aria-label="Confirm Password" aria-describedby="addon-wrapping">
+                <input type="text" class="form-control" placeholder="Email" aria-label="Email" aria-describedby="addon-wrapping" name="email">
+                <input type="password" class="form-control" placeholder="Password" aria-label="Password" aria-describedby="addon-wrapping" name="pwd">
+                <input type="password" class="form-control" placeholder="Confirm Password" aria-label="Confirm Password" aria-describedby="addon-wrapping" name="confirmpwd">
                 <button type="submit" class="btn btn-primary">Register</button>
               </div>
 

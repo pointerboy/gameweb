@@ -1,10 +1,11 @@
-from flask import Flask, render_template
-from .config import AUTH_SQLITE_URI
+from flask import Flask, render_template, request, flash, url_for, session, redirect
+from .config import AUTH_SQLITE_URI, SECRET_KEY
 from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = AUTH_SQLITE_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = SECRET_KEY
 
 db = SQLAlchemy(app)
 
@@ -21,14 +22,58 @@ class User(db.Model):
 
 db.create_all()
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login_route():
+    if request.method == "POST":
+        if not request.form['username'] or not request.form['pwd']:
+            flash('Please enter all the fields', 'error')
+            return redirect(url_for('landing'))
+
+        
     return render_template('usercontrol/login.html') 
     
 @app.route('/')
 def landing():
     return render_template('landingpage/index.html')
 
-@app.route('/register')
+#TODO: Validate shit ton
+
+@app.route('/register', methods=['GET', 'POST'])
 def register_route():
+    if request.method == 'POST':
+        #TODO: Handle emails and usernames that are already being used
+        if not request.form['email'] or not request.form['pwd'] or not request.form['confirmpwd']:
+            flash('Please enter all the fields', 'error')
+            return redirect(url_for('landing'))
+
+        if request.form['pwd'] != request.form['confirmpwd']:
+            flash('Passwords do not match', 'error')
+            return redirect(url_for('landing'))
+
+        session['email'] = request.form['email']
+        session['pwd'] = request.form['pwd']
+
+        return redirect(url_for('register_username'))
+
     return render_template('usercontrol/register.html')
+
+@app.route('/register_username', methods=['GET', 'POST'])
+def register_username():
+    if not 'email' in session or not 'pwd' in session:
+            flash('Whacha doin?')
+            return redirect(url_for('/'))
+
+    if request.method == "POST":
+        #TODO: Duplicate username
+        if not request.form['username']:
+            flash("You need to fill out the username.", "error")
+            return redirect(url_for('/'))
+
+        user = User(request.form['username'], session['email'], session['pwd'])
+        
+        db.session.add(user)
+        db.session.commit()
+
+        flash("You got registered scrub")
+        return redirect(url_for('landing'))
+    return render_template("usercontrol/register_username.html")
