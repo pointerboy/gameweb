@@ -27,7 +27,17 @@
             </span>
           </div>
         </nav>
-    
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class=flashes>
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %} 
+        {% endwith %}
+
         <form class="input-group flex-nowrap" action="{{ url_for('register_route') }}" method="POST">
                 <div class="input-group-prepend">
                   <span class="input-group-text" id="addon-wrapping">@</span>

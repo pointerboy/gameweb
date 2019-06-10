@@ -4,6 +4,16 @@
         <title>Enter username</title>
     </head>
     <body>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <ul class=flashes>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+            {% endif %} 
+        {% endwith %}
+
         <form action="{{ url_for('register_username') }}" method="POST">
             <input type="text" placeholder="Username" name="username">
             <button type="submit">Confirm</button>
