@@ -29,8 +29,20 @@ def login_route():
     if request.method == "POST":
         if not request.form['username'] or not request.form['pwd']:
             flash('Please enter all the fields', 'error')
-            return redirect(url_for('landing'))
+            return render_template("usercontrol/login.html")
+        
+        pwd = db.session.query(User.password).filter_by(username=request.form['username']).scalar()
 
+        if not pwd:
+            flash("No user with such username exists!", "error")
+            return render_template("usercontrol/login.html")
+
+        if request.form['pwd'] != pwd:
+            flash("Incorrect password!", "error")
+            return render_template("usercontrol/login.html")
+
+        flash("You have been logged in. Welcome back!")
+        return redirect(url_for("landing"))
         
     return render_template('usercontrol/login.html') 
     
