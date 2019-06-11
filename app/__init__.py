@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, flash, url_for, session, redi
 from .config import AUTH_SQLITE_URI, SECRET_KEY
 from flask_sqlalchemy import SQLAlchemy
 import re
+from hashlib import sha256
 
 app = Flask(__name__)
 
@@ -31,13 +32,15 @@ def login_route():
             flash('Please enter all the fields', 'error')
             return render_template("usercontrol/login.html")
         
-        pwd = db.session.query(User.password).filter_by(username=request.form['username']).scalar()
+        pwd_hash = db.session.query(User.password).filter_by(username=request.form['username']).scalar()
 
-        if not pwd:
+        if not pwd_hash:
             flash("No user with such username exists!", "error")
             return render_template("usercontrol/login.html")
 
-        if request.form['pwd'] != pwd:
+        new_pwd_hash = sha256(bytes(request.form['pwd']+SECRET_KEY, "utf-8")).hexdigest()
+
+        if new_pwd_hash != pwd_hash:
             flash("Incorrect password!", "error")
             return render_template("usercontrol/login.html")
 
@@ -94,7 +97,9 @@ def register_username():
             flash("Username already exists", 'error')
             return render_template('usercontrol/register_username.html')
 
-        user = User(request.form['username'], session['email'], session['pwd'])
+        pwd_hash = sha256(bytes(session['pwd']+SECRET_KEY, 'utf-8')).hexdigest()
+
+        user = User(request.form['username'], session['email'], pwd_hash)
         
         db.session.add(user)
         db.session.commit()
