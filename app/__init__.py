@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request, flash, url_for, session, redirect
-from .config import AUTH_SQLITE_URI, SECRET_KEY
+from flask import Flask, render_template, request, flash, url_for, session, redirect, make_response
+from .config import AUTH_SQLITE_URI, SECRET_KEY, LOGGOFF_AUTO_IN
 from flask_sqlalchemy import SQLAlchemy
 import re
 from hashlib import sha256
+from datetime import datetime, timedelta
+import json
 
 app = Flask(__name__)
 
@@ -44,16 +46,30 @@ def login_route():
             flash("Incorrect password!", "error")
             return render_template("usercontrol/login.html")
 
-        session['loggedin'] = True
-
         flash("You have been logged in. Welcome back!")
-        return redirect(url_for("landing"))
-        
+
+        response = make_response(redirect(url_for('landing')))
+        response.set_cookie('creds', json.dumps({'username': request.form['username'], 'pwd': pwd_hash}), 
+                            expires=datetime.now() + timedelta(**LOGGOFF_AUTO_IN))
+        return response
+
     return render_template('usercontrol/login.html') 
     
 @app.route('/')
 def landing():
-    loggedin = True if 'loggedin' in session else False
+    if request.cookies.get('creds'):
+
+        creds=json.loads(request.cookies.get('creds'))
+        
+        username_pwd_hash = db.session.query(User.password).filter_by(username=creds['username']).scalar()
+
+        if creds['pwd'] == username_pwd_hash:
+            loggedin = True
+        else:
+            loggedin = False
+    else:
+        loggedin = False
+
     return render_template('landingpage/index.html',loggedin=loggedin)
 
 #TODO: Validate shit ton
@@ -108,5 +124,10 @@ def register_username():
         db.session.commit()
 
         flash("You have been successfully registered!")
-        return redirect(url_for('landing'))
+
+        response = make_response(redirect(url_for('landing')))
+        response.set_cookie('creds', json.dumps({'username': request.form['username'], 'pwd': pwd_hash}), 
+                            expires=datetime.now() + timedelta(**LOGGOFF_AUTO_IN))
+        return response
+
     return render_template("usercontrol/register_username.html")
