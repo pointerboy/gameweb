@@ -46,6 +46,8 @@ def login_route():
             flash("Incorrect password!", "error")
             return render_template("usercontrol/login.html")
 
+        session['loggedin'] = True
+
         flash("You have been logged in. Welcome back!")
 
         response = make_response(redirect(url_for('landing')))
@@ -69,7 +71,7 @@ def landing():
             loggedin = False
     else:
         loggedin = False
-
+    
     return render_template('landingpage/index.html',loggedin=loggedin)
 
 #TODO: Validate shit ton
