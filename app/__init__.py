@@ -72,6 +72,14 @@ def landing():
 
     return render_template('landingpage/index.html',loggedin=loggedin)
 
+@app.route('/game/ping_pong')
+def game_ping_pong():
+    return render_template('games/pingpong.html')
+
+@app.route('/game/snake')
+def game_snake():
+    return render_template('games/snake.html')
+
 #TODO: Validate shit ton
 
 @app.route('/register', methods=['GET', 'POST'])
