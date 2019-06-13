@@ -51,6 +51,16 @@
                   Games:
                 </div>
               </div>
+            <div class="card-body">
+              <h5 class="card-title">Snake</h5>
+              <p class="card-text">Classical game where you are a snake and you have to eat food.</p>
+              <a href={{ url_for('game_snake') }} class="btn btn-primary">Play</a>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Ping Pong</h5>
+              <p class="card-text">Classical game where a ball is flying towards players and they have to kick it back. Loses the one who doesn't kick the ball back.</p>
+              <a href={{ url_for('game_ping_pong') }} class="btn btn-primary">Play</a>
+            </div>
         </div>
 
     {% with messages = get_flashed_messages() %}
