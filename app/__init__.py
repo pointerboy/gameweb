@@ -80,7 +80,7 @@ def game_ping_pong():
 
 @app.route('/game/snake')
 def game_snake():
-    return render_template('games/snake.html')
+    return render_template('games/snake/snake.html')
 
 #TODO: Validate shit ton
 
