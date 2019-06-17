@@ -27,6 +27,14 @@ class User(db.Model):
 
 db.create_all()
 
+# Error handling
+@app.errorhandler(404)
+def page_not_found_route(e):
+    return "File could not be found on Gameweb"
+@app.errorhandler(500)
+def intrn_error_route(e):
+    return "An issue occured while trying to complete an action"
+
 @app.route('/login', methods=['GET', 'POST'])
 def login_route():
     if request.method == "POST":
